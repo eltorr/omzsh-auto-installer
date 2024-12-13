@@ -20,10 +20,13 @@ install_packages() {
     fi
 }
 
-# Function to remove existing Zsh and Oh My Zsh installations
-cleanup_zsh() {
-    echo "Removing existing Zsh and Oh My Zsh installations..."
+cleanup_all() {
+    echo "Performing comprehensive cleanup..."
+
+    # Remove Zsh-specific components
+    echo "Removing Zsh..."
     rm -rf $HOME/.oh-my-zsh
+    rm -f $HOME/.zshrc $HOME/.zsh_history
     if command -v apt > /dev/null; then
         sudo apt remove --purge zsh -y
     elif command -v dnf > /dev/null; then
@@ -33,12 +36,47 @@ cleanup_zsh() {
     elif command -v pacman > /dev/null; then
         sudo pacman -Rns --noconfirm zsh
     fi
-    rm -f $HOME/.zshrc $HOME/.zsh_history
-    echo "Cleanup complete."
+
+    # Remove Powerlevel10k configuration (if it exists outside Oh My Zsh)
+    echo "Removing Powerlevel10k configuration..."
+    rm -f $HOME/.p10k.zsh
+
+    # Remove other shell configurations (bash, fish, etc.) if needed
+    echo "Removing Bash configuration (if it was modified for zsh)..."
+    if grep -q 'exec zsh' $HOME/.bashrc; then
+        sed -i '/exec zsh/d' $HOME/.bashrc
+    fi
+
+    # Remove other potential terminal customizations
+    echo "Removing other potential terminal customizations..."
+    # Example: if you've modified your terminal's profile settings directly
+    # (These paths are examples and might vary depending on your system)
+    # rm -f $HOME/.config/terminator/config # For Terminator
+    # rm -f $HOME/.config/gnome-terminal/ # For Gnome Terminal
+    # ... add other terminal-specific paths as needed
+
+    # Remove related packages (if they were installed specifically for zsh)
+    echo "Removing related packages (if applicable)..."
+    if command -v apt > /dev/null; then
+        sudo apt remove --purge neofetch # Example
+    elif command -v dnf > /dev/null; then
+        sudo dnf remove neofetch
+    elif command -v yum > /dev/null; then
+        sudo yum remove neofetch
+    elif command -v pacman > /dev/null; then
+        sudo pacman -Rns --noconfirm neofetch
+    fi
+    
+    # Remove any custom fonts you might have installed for Powerlevel10k
+    echo "Removing custom fonts (if applicable)..."
+    # Example: If you installed fonts to ~/.local/share/fonts
+    # rm -rf $HOME/.local/share/fonts/Meslo* # Replace Meslo* with the actual font name
+
+    echo "Comprehensive cleanup complete."
 }
 
 # Cleanup existing installations
-cleanup_zsh
+cleanup_all
 
 # Update and install Zsh and necessary packages
 echo "Installing Zsh, Git, Wget, and Curl..."
