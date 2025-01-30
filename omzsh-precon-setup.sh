@@ -113,12 +113,10 @@ echo 'LC_CTYPE=C' >> $HOME/.zshrc
 # Create a basic p10k config file using pure ASCII characters
 cat > $HOME/.p10k.zsh << 'EOF'
 # Force ASCII mode
-emulate sh -c 'source /dev/stdin' <<\EOF
 POWERLEVEL9K_MODE=ascii
-EOF
 
 # Basic p10k configuration
-typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(user dir vcs)
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(user dir vcs newline prompt_char)
 typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time)
 
 # Minimal ASCII symbols
@@ -129,12 +127,30 @@ typeset -g POWERLEVEL9K_FOLDER_ICON=''
 typeset -g POWERLEVEL9K_VCS_STAGED_ICON='*'
 typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON='!'
 typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
-typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VIINS_CONTENT_EXPANSION='$'
 
-# Simple prompt style
-typeset -g POWERLEVEL9K_PROMPT_ON_NEWLINE=false
-typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
-typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
+# Directory truncation
+typeset -g POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_last"
+typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
+typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=30
+
+# Prompt style with separators
+typeset -g POWERLEVEL9K_PROMPT_ON_NEWLINE=true
+typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="┌─"
+typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX="├─"
+typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="└─$ "
+typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VIINS_CONTENT_EXPANSION=""
+
+# Segment separators
+typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR="─"
+typeset -g POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR="─"
+typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR="─"
+typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR="─"
+
+# Separator between prompt segments
+typeset -g POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL="["
+typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL="]"
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL="["
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL="]"
 
 # Disable all fancy features
 typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS=true
