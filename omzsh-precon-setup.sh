@@ -58,11 +58,11 @@ cleanup_all() {
     # Remove related packages (if they were installed specifically for zsh)
     echo "Removing related packages (if applicable)..."
     if command -v apt > /dev/null; then
-        sudo apt remove --purge neofetch # Example
+        sudo apt remove --purge neofetch -y
     elif command -v dnf > /dev/null; then
-        sudo dnf remove neofetch
+        sudo dnf remove neofetch -y
     elif command -v yum > /dev/null; then
-        sudo yum remove neofetch
+        sudo yum remove neofetch -y
     elif command -v pacman > /dev/null; then
         sudo pacman -Rns --noconfirm neofetch
     fi
