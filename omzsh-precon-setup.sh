@@ -94,8 +94,9 @@ fi
 
 # Update .zshrc with necessary configurations before p10k
 sed -i '1i\
-# Disable p10k configuration wizard and use ANSI\
+# Disable p10k configuration wizard and use ASCII\
 POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true\
+POWERLEVEL9K_MODE=ascii\
 \
 # Disable special characters\
 POWERLEVEL9K_VCS_DISABLE_GITSTATUS=true\
@@ -105,37 +106,38 @@ POWERLEVEL9K_DISABLE_HOT_RELOAD=true\
 ZLE_RPROMPT_INDENT=0\
 POWERLEVEL9K_LEGACY_ICON_SPACING=true' $HOME/.zshrc
 
-# Create a basic p10k config file using ANSI characters
+# Create a basic p10k config file using pure ASCII characters
 cat > $HOME/.p10k.zsh << 'EOF'
+# Force ASCII mode
+POWERLEVEL9K_MODE=ascii
+
 # Basic p10k configuration
 typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(user dir vcs newline prompt_char)
 typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time)
+
+# Minimal ASCII symbols
+typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=''
+typeset -g POWERLEVEL9K_HOME_ICON=''
+typeset -g POWERLEVEL9K_HOME_SUB_ICON='/'
+typeset -g POWERLEVEL9K_FOLDER_ICON=''
+typeset -g POWERLEVEL9K_VCS_STAGED_ICON='*'
+typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON='!'
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
+typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VIINS_CONTENT_EXPANSION='$'
 
 # Directory truncation
 typeset -g POWERLEVEL9K_SHORTEN_STRATEGY="truncate_to_last"
 typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
 typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=30
+typeset -g POWERLEVEL9K_DIR_SHOW_WRITABLE=true
 
-# Prompt style with separators
+# Simple prompt style
 typeset -g POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX="┌─"
-typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX="├─"
-typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="└─$ "
-typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VIINS_CONTENT_EXPANSION=""
+typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
+typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX=""
+typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
 
-# Segment separators
-typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR="─"
-typeset -g POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR="─"
-typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR="─"
-typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR="─"
-
-# Separator between prompt segments
-typeset -g POWERLEVEL9K_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL="["
-typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL="]"
-typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL="["
-typeset -g POWERLEVEL9K_RIGHT_PROMPT_LAST_SEGMENT_END_SYMBOL="]"
-
-# Disable fancy features
+# Disable all fancy features
 typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS=true
 typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
 EOF
