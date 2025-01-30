@@ -47,7 +47,7 @@ install_packages zsh git wget curl
 
 # Install Oh My Zsh
 echo "Installing Oh My Zsh..."
-RUNZSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+ZSH= RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 # Configure .zshrc
 cat > $HOME/.zshrc << 'EOF'
@@ -121,7 +121,7 @@ setup_neofetch() {
 :██║  ██║ ██████╔╝ ██║     :
 :╚═╝  ╚═╝ ╚═════╝  ╚═╝     :
 ··························
-
+Rapid Deployment Framework...
 EOF
 
     # Create custom neofetch config
