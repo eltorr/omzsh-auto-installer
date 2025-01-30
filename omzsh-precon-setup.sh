@@ -94,31 +94,51 @@ fi
 
 # Update .zshrc with necessary configurations before p10k
 sed -i '1i\
-# Disable p10k configuration wizard\
+# Disable p10k configuration wizard and use ASCII\
 POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true\
+POWERLEVEL9K_MODE=ascii\
+\
+# Disable special characters\
+POWERLEVEL9K_VCS_DISABLE_GITSTATUS=true\
+POWERLEVEL9K_DISABLE_HOT_RELOAD=true\
 \
 # Fix prompt spacing\
 ZLE_RPROMPT_INDENT=0\
 POWERLEVEL9K_LEGACY_ICON_SPACING=true' $HOME/.zshrc
 
-# Create a basic p10k config file using ASCII characters
+# Also add this to force ASCII mode
+echo 'TERM=xterm-256color' >> $HOME/.zshrc
+echo 'LC_CTYPE=C' >> $HOME/.zshrc
+
+# Create a basic p10k config file using pure ASCII characters
 cat > $HOME/.p10k.zsh << 'EOF'
-# Basic p10k configuration with ASCII characters
-typeset -g POWERLEVEL9K_MODE='ascii'
-typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs)
-typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs time)
-typeset -g POWERLEVEL9K_PROMPT_ON_NEWLINE=true
-typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
-typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="> "
-typeset -g POWERLEVEL9K_VCS_BRANCH_ICON='@'
-typeset -g POWERLEVEL9K_HOME_ICON='~'
+# Force ASCII mode
+emulate sh -c 'source /dev/stdin' <<\EOF
+POWERLEVEL9K_MODE=ascii
+EOF
+
+# Basic p10k configuration
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(user dir vcs)
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status time)
+
+# Minimal ASCII symbols
+typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=''
+typeset -g POWERLEVEL9K_HOME_ICON=''
 typeset -g POWERLEVEL9K_HOME_SUB_ICON='/'
-typeset -g POWERLEVEL9K_FOLDER_ICON='/'
-typeset -g POWERLEVEL9K_VCS_STAGED_ICON='+'
+typeset -g POWERLEVEL9K_FOLDER_ICON=''
+typeset -g POWERLEVEL9K_VCS_STAGED_ICON='*'
 typeset -g POWERLEVEL9K_VCS_UNSTAGED_ICON='!'
 typeset -g POWERLEVEL9K_VCS_UNTRACKED_ICON='?'
-typeset -g POWERLEVEL9K_VCS_STASH_ICON='#'
 typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VIINS_CONTENT_EXPANSION='$'
+
+# Simple prompt style
+typeset -g POWERLEVEL9K_PROMPT_ON_NEWLINE=false
+typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
+typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="$ "
+
+# Disable all fancy features
+typeset -g POWERLEVEL9K_VCS_DISABLE_GITSTATUS=true
+typeset -g POWERLEVEL9K_DISABLE_HOT_RELOAD=true
 EOF
 
 # Install and configure Powerlevel10k theme
@@ -180,8 +200,78 @@ EOF
     echo 'neofetch --config ${HOME}/.config/neofetch/config.conf --ascii ${HOME}/.config/neofetch/ascii_art.txt' >> $HOME/.zshrc
 }
 
+# Function to setup default directory
+setup_default_directory() {
+    local default_dir="/vm/ovfs/configs/goldbuild-vlaptop"
+    
+    # Create the directory if it doesn't exist
+    echo "Creating default working directory..."
+    mkdir -p "$default_dir"
+    
+    # Add to .bashrc (for backup/initial login)
+    echo "cd $default_dir" >> $HOME/.bashrc
+    
+    # Add to .zshrc (for zsh)
+    echo "cd $default_dir" >> $HOME/.zshrc
+    
+    # Set proper ownership
+    chown -R $USER:$USER "$default_dir"
+}
+
 # Call setup_neofetch with optional custom ASCII art path
 setup_neofetch "$@"
+
+# Setup default directory
+setup_default_directory
+
+# Add Terraform aliases to .zshrc
+cat >> $HOME/.zshrc << 'EOF'
+
+# Terraform aliases
+alias tf='terraform'
+alias tfin='terraform init'
+alias tfap='terraform apply'
+alias tfapa='terraform apply -auto-approve'
+alias tdes='terraform destroy'
+alias tdesa='terraform destroy -auto-approve'
+alias tplan='terraform plan'
+alias tfmt='terraform fmt'
+alias tfinap='terraform init && terraform apply'
+alias tfinapa='terraform init && terraform apply -auto-approve'
+alias tfinda='terraform init && terraform destroy -auto-approve'
+alias tfws='terraform workspace'
+alias tfwsl='terraform workspace list'
+alias tfwss='terraform workspace select'
+alias tfwsn='terraform workspace new'
+alias tfv='terraform validate'
+alias tfst='terraform state'
+alias tfstl='terraform state list'
+alias tfsts='terraform state show'
+alias tfo='terraform output'
+alias tfim='terraform import'
+alias tfpr='terraform providers'
+
+# Terraform workspace color status in prompt
+alias tfwsc='terraform workspace show | grep "*" > /dev/null && echo -n "($(terraform workspace show))"'
+
+# Combined commands
+alias tfinv='terraform init && terraform validate'
+alias tfinp='terraform init && terraform plan'
+alias tfref='terraform refresh'
+
+# Terraform with variables
+alias tfapv='terraform apply -var-file'
+alias tplv='terraform plan -var-file'
+
+# Terraform state manipulation
+alias tfstm='terraform state mv'
+alias tfstr='terraform state rm'
+alias tfstp='terraform state pull'
+alias tfstpu='terraform state push'
+
+# Terraform documentation
+alias tfdoc='terraform-docs'
+EOF
 
 # Apply changes and switch to Zsh
 echo "Switching to Zsh and applying changes..."
