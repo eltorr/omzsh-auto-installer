@@ -132,10 +132,56 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.
 git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 sed -i '/plugins=(/c\plugins=(git zsh-autosuggestions zsh-syntax-highlighting)' $HOME/.zshrc
 
-# Install Neofetch for system information on terminal start
-echo "Installing Neofetch..."
-install_packages neofetch
-echo "neofetch" >> $HOME/.zshrc
+# Function to setup neofetch with custom ASCII art
+setup_neofetch() {
+    local ascii_art_path=${1:-"$HOME/.config/neofetch/ascii_art.txt"}
+    
+    echo "Installing Neofetch..."
+    install_packages neofetch
+
+    # Create neofetch config directory if it doesn't exist
+    mkdir -p $HOME/.config/neofetch
+
+    # If custom ASCII art path is provided and exists, copy it
+    if [ "$1" ] && [ -f "$1" ]; then
+        echo "Using custom ASCII art from: $1"
+        cp "$1" $HOME/.config/neofetch/ascii_art.txt
+    fi
+
+    # Create custom neofetch config if it doesn't exist
+    if [ ! -f "$HOME/.config/neofetch/config.conf" ]; then
+        echo "Creating default neofetch config..."
+        cat > $HOME/.config/neofetch/config.conf << 'EOF'
+print_info() {
+    info title
+    info underline
+    info "OS" distro
+    info "Host" model
+    info "Kernel" kernel
+    info "Uptime" uptime
+    info "Packages" packages
+    info "Shell" shell
+    info "CPU" cpu
+    info "Memory" memory
+}
+
+# ASCII Settings
+ascii_distro="none"
+ascii_colors=(4 4 4 4 4 6)
+ascii_bold="on"
+
+# Use custom ASCII art file
+image_backend="ascii"
+image_source="${HOME}/.config/neofetch/ascii_art.txt"
+EOF
+    fi
+
+    # Add neofetch with explicit config to zshrc
+    echo 'neofetch --config ${HOME}/.config/neofetch/config.conf --ascii ${HOME}/.config/neofetch/ascii_art.txt' >> $HOME/.zshrc
+}
+
+# Call setup_neofetch with optional custom ASCII art path
+setup_neofetch "$@"
 
 # Apply changes and switch to Zsh
 echo "Switching to Zsh and applying changes..."
