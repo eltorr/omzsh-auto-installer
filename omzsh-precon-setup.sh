@@ -70,9 +70,6 @@ plugins=(
 # Source oh-my-zsh
 source $ZSH/oh-my-zsh.sh
 
-# Default directory
-cd /vm/ovfs/configs/
-
 # Terraform aliases
 alias tf='terraform'
 alias tfin='terraform init'
@@ -108,24 +105,27 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-$HO
 
 # Function to setup neofetch with custom ASCII art
 setup_neofetch() {
-    local ascii_art_path=${1:-"$HOME/.config/neofetch/ascii_art.txt"}
-    
     echo "Installing Neofetch..."
     install_packages neofetch
 
-    # Create neofetch config directory if it doesn't exist
+    # Create neofetch config directory
     mkdir -p $HOME/.config/neofetch
 
-    # If custom ASCII art path is provided and exists, copy it
-    if [ "$1" ] && [ -f "$1" ]; then
-        echo "Using custom ASCII art from: $1"
-        cp "$1" $HOME/.config/neofetch/ascii_art.txt
-    fi
+    # Create ASCII art file
+    cat > $HOME/.config/neofetch/ascii_art.txt << 'EOF'
+··························
+:██████╗  ██████╗  ███████╗:
+:██╔══██╗ ██╔══██╗ ██╔════╝:
+:██████╔╝ ██║  ██║ █████╗  :
+:██╔══██╗ ██║  ██║ ██╔══╝  :
+:██║  ██║ ██████╔╝ ██║     :
+:╚═╝  ╚═╝ ╚═════╝  ╚═╝     :
+··························
 
-    # Create custom neofetch config if it doesn't exist
-    if [ ! -f "$HOME/.config/neofetch/config.conf" ]; then
-        echo "Creating default neofetch config..."
-        cat > $HOME/.config/neofetch/config.conf << 'EOF'
+EOF
+
+    # Create custom neofetch config
+    cat > $HOME/.config/neofetch/config.conf << 'EOF'
 print_info() {
     info title
     info underline
@@ -148,7 +148,6 @@ ascii_bold="on"
 image_backend="ascii"
 image_source="${HOME}/.config/neofetch/ascii_art.txt"
 EOF
-    fi
 
     # Add neofetch with explicit config to zshrc
     echo 'neofetch --config ${HOME}/.config/neofetch/config.conf --ascii ${HOME}/.config/neofetch/ascii_art.txt' >> $HOME/.zshrc
