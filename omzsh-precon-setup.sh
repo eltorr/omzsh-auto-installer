@@ -55,39 +55,7 @@ cat > $HOME/.zshrc << 'EOF'
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme settings
-ZSH_THEME="agnoster"
-
-# Configure agnoster theme to use simple characters
-AGNOSTER_PROMPT_SEGMENTS=(
-    prompt_status
-    prompt_context
-    prompt_dir
-    prompt_git
-    prompt_end
-)
-
-# Override agnoster theme characters
-SEGMENT_SEPARATOR=""
-PLUSMINUS="±"
-BRANCH="⭠"
-DETACHED="⭠"
-CROSS="✘"
-LIGHTNING="⚡"
-GEAR="⚙"
-
-# Customize prompt segments for simpler display
-prompt_segment() {
-    local bg fg
-    [[ -n $1 ]] && bg="%K{$1}" || bg="%k"
-    [[ -n $2 ]] && fg="%F{$2}" || fg="%f"
-    if [[ $CURRENT_BG != 'NONE' && $1 != $CURRENT_BG ]]; then
-        echo -n "%{$bg%F{$CURRENT_BG}%}%{$fg%}"
-    else
-        echo -n "%{$bg%}%{$fg%}"
-    fi
-    CURRENT_BG=$1
-    [[ -n $3 ]] && echo -n $3
-}
+ZSH_THEME="robbyrussell"
 
 # Plugins
 plugins=(
@@ -101,17 +69,6 @@ plugins=(
 
 # Source oh-my-zsh
 source $ZSH/oh-my-zsh.sh
-
-# Customize prompt segments
-prompt_context() {
-    if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-        prompt_segment black default "%(!.%{%F{yellow}%}.)$USER@%m"
-    fi
-}
-
-# Terminal settings
-PROMPT_EOL_MARK=""
-setopt PROMPT_SP
 
 # Default directory
 cd /vm/ovfs/configs/
