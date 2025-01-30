@@ -23,6 +23,12 @@ chmod +x omzsh-setup.sh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/eltorr/omzsh-auto-installer/refs/heads/main/omzsh-setup.sh)"
 ```
 
+**3. Run Inline (preconfigured):**
+
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/eltorr/omzsh-auto-installer/refs/heads/main/omzsh-precon-setup.sh)"
+```
+
 **Post-Installation:**
 
 **Powerlevel10k Configuration (Optional):**
