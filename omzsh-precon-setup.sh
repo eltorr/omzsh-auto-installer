@@ -20,7 +20,7 @@ install_packages() {
     fi
 }
 
-# Function to install shell management tools to use chsh and set zsh as default shell
+# Function to install shell management tools
 install_shell_tools() {
     echo "Installing shell management utilities..."
     if command -v apt > /dev/null; then
@@ -28,7 +28,7 @@ install_shell_tools() {
         sudo apt update && sudo apt install -y util-linux passwd
     elif command -v dnf > /dev/null; then
         # Fedora/RHEL 8+
-        sudo dnf install -y util-linux-user
+        sudo dnf install -y util-linux
     elif command -v yum > /dev/null; then
         # CentOS/RHEL 7
         sudo yum install -y util-linux-user
@@ -56,21 +56,108 @@ cleanup_all() {
     fi
 }
 
-# Cleanup existing installations
+# Function to properly register zsh shell
+register_zsh_shell() {
+    echo "Registering zsh shell..."
+    ZSH_PATH=$(which zsh)
+    if [ -n "$ZSH_PATH" ]; then
+        echo "Found zsh at: $ZSH_PATH"
+        # Check if zsh is already in /etc/shells
+        if ! grep -q "$ZSH_PATH" /etc/shells; then
+            echo "Adding $ZSH_PATH to /etc/shells"
+            echo "$ZSH_PATH" | sudo tee -a /etc/shells
+        else
+            echo "$ZSH_PATH already in /etc/shells"
+        fi
+    else
+        echo "ZSH not found! Installation may have failed."
+        exit 1
+    fi
+}
+
+# Function to setup neofetch with custom ASCII art
+setup_neofetch() {
+    echo "Installing Neofetch..."
+    # Try to install neofetch or build from source if needed
+    if ! install_packages neofetch; then
+        echo "Installing Neofetch from source..."
+        cd /tmp
+        git clone https://github.com/dylanaraps/neofetch.git
+        cd neofetch
+        sudo make install
+        cd $HOME
+    fi
+
+    # Create neofetch config directory
+    mkdir -p $HOME/.config/neofetch
+
+    # Create ASCII art file
+    cat > $HOME/.config/neofetch/ascii_art.txt << 'EOF'
+··························
+:██████╗  ██████╗  ███████╗:
+:██╔══██╗ ██╔══██╗ ██╔════╝:
+:██████╔╝ ██║  ██║ █████╗  :
+:██╔══██╗ ██║  ██║ ██╔══╝  :
+:██║  ██║ ██████╔╝ ██║     :
+:╚═╝  ╚═╝ ╚═════╝  ╚═╝     :
+··························
+Rapid Deployment Framework...
+EOF
+
+    # Create custom neofetch config
+    cat > $HOME/.config/neofetch/config.conf << 'EOF'
+print_info() {
+    info title
+    info underline
+    info "OS" distro
+    info "Host" model
+    info "Kernel" kernel
+    info "Uptime" uptime
+    info "Packages" packages
+    info "Shell" shell
+    info "CPU" cpu
+    info "Memory" memory
+}
+
+# ASCII Settings
+ascii_distro="none"
+ascii_colors=(4 4 4 4 4 6)
+ascii_bold="on"
+
+# Use custom ASCII art file
+image_backend="ascii"
+image_source="${HOME}/.config/neofetch/ascii_art.txt"
+EOF
+
+    # Add neofetch with explicit config to zshrc
+    echo 'neofetch --config ${HOME}/.config/neofetch/config.conf --ascii ${HOME}/.config/neofetch/ascii_art.txt' >> $HOME/.zshrc
+}
+
+########################################
+# MAIN SCRIPT EXECUTION STARTS HERE
+########################################
+
+echo "=== Starting ZSH and Developer Environment Setup ==="
+
+# 1. Cleanup existing installations
+echo "Step 1: Cleaning up any existing installations..."
 cleanup_all
 
-# Install required packages
-echo "Installing required packages..."
+# 2. Install all required dependencies
+echo "Step 2: Installing all required dependencies..."
 install_packages zsh git wget curl
-
-# Install shell management tools
 install_shell_tools
 
-# Install Oh My Zsh
-echo "Installing Oh My Zsh..."
+# 3. Register ZSH shell
+echo "Step 3: Registering ZSH shell..."
+register_zsh_shell
+
+# 4. Install Oh My Zsh and configure shell
+echo "Step 4: Installing Oh My Zsh and configuring shell..."
 ZSH= RUNZSH=no KEEP_ZSHRC=yes CHSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-# Configure .zshrc
+# 5. Configure .zshrc
+echo "Step 5: Creating ZSH configuration..."
 cat > $HOME/.zshrc << 'EOF'
 # Path to oh-my-zsh installation
 export ZSH="$HOME/.oh-my-zsh"
@@ -119,79 +206,43 @@ alias l='ls -lh'
 alias grep='grep --color=auto'
 EOF
 
-# Install plugins
-echo "Installing plugins..."
+# 6. Install plugins
+echo "Step 6: Installing ZSH plugins..."
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 git clone https://github.com/zsh-users/zsh-syntax-highlighting ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
-# Function to setup neofetch with custom ASCII art
-setup_neofetch() {
-    echo "Installing Neofetch..."
-    install_packages neofetch
+# 7. Setup Neofetch
+echo "Step 7: Setting up Neofetch..."
+setup_neofetch
 
-    # Create neofetch config directory
-    mkdir -p $HOME/.config/neofetch
-
-    # Create ASCII art file
-    cat > $HOME/.config/neofetch/ascii_art.txt << 'EOF'
-··························
-:██████╗  ██████╗  ███████╗:
-:██╔══██╗ ██╔══██╗ ██╔════╝:
-:██████╔╝ ██║  ██║ █████╗  :
-:██╔══██╗ ██║  ██║ ██╔══╝  :
-:██║  ██║ ██████╔╝ ██║     :
-:╚═╝  ╚═╝ ╚═════╝  ╚═╝     :
-··························
-Rapid Deployment Framework...
-EOF
-
-    # Create custom neofetch config
-    cat > $HOME/.config/neofetch/config.conf << 'EOF'
-print_info() {
-    info title
-    info underline
-    info "OS" distro
-    info "Host" model
-    info "Kernel" kernel
-    info "Uptime" uptime
-    info "Packages" packages
-    info "Shell" shell
-    info "CPU" cpu
-    info "Memory" memory
-}
-
-# ASCII Settings
-ascii_distro="none"
-ascii_colors=(4 4 4 4 4 6)
-ascii_bold="on"
-
-# Use custom ASCII art file
-image_backend="ascii"
-image_source="${HOME}/.config/neofetch/ascii_art.txt"
-EOF
-
-    # Add neofetch with explicit config to zshrc
-    echo 'neofetch --config ${HOME}/.config/neofetch/config.conf --ascii ${HOME}/.config/neofetch/ascii_art.txt' >> $HOME/.zshrc
-}
-
-# Setup neofetch
-setup_neofetch "$@"
-
-# Set zsh as default shell
-echo "Setting zsh as default shell..."
-sudo chsh -s $(which zsh) $USER
-
-# Add zsh launch to .bashrc for non-login shells
-echo "Adding zsh launch to .bashrc..."
+# 8. Configure .bashrc to launch zsh
+echo "Step 8: Setting up .bashrc to launch ZSH automatically..."
 if ! grep -q "exec zsh" $HOME/.bashrc; then
     echo "# Start zsh if it exists" >> $HOME/.bashrc
-    echo "if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ]; then" >> $HOME/.bashrc
+    echo "if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ] || [ -f /usr/sbin/zsh ]; then" >> $HOME/.bashrc
     echo "    if [[ \$- == *i* ]]; then" >> $HOME/.bashrc
     echo "        exec zsh" >> $HOME/.bashrc
     echo "    fi" >> $HOME/.bashrc
     echo "fi" >> $HOME/.bashrc
 fi
 
-# Switch to Zsh
-echo "Switching to Zsh..."
-exec zsh
+# 9. Set zsh as default shell
+echo "Step 9: Setting ZSH as default shell..."
+ZSH_PATH=$(which zsh)
+if [ -n "$ZSH_PATH" ]; then
+    echo "Attempting to change shell with chsh..."
+    sudo chsh -s "$ZSH_PATH" "$USER"
+    
+    echo "NOTE: For the shell change to take effect, you may need to log out and log back in."
+    echo "ZSH path: $ZSH_PATH"
+    echo "Current user: $USER"
+    echo "Current shell according to passwd: $(getent passwd "$USER" | cut -d: -f7)"
+else
+    echo "ZSH not found! Cannot change shell."
+fi
+
+echo "=== Setup complete! ==="
+echo "Starting ZSH for current session..."
+
+# 10. Switch to Zsh for current session
+exec "$ZSH_PATH" -l
