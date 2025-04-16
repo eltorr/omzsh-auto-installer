@@ -78,14 +78,21 @@ register_zsh_shell() {
 # Function to setup neofetch with custom ASCII art
 setup_neofetch() {
     echo "Installing Neofetch..."
-    # Try to install neofetch or build from source if needed
+    # Try to install neofetch from package manager
     if ! install_packages neofetch; then
-        echo "Installing Neofetch from source..."
+        echo "Installing Neofetch from source repository..."
+        # Remove existing directory if present
+        rm -rf /tmp/neofetch
+        
+        # Clone and install neofetch
         cd /tmp
         git clone https://github.com/dylanaraps/neofetch.git
         cd neofetch
-        sudo make install
+        # No compilation needed - just copy the script
+        sudo cp -v neofetch /usr/local/bin/
+        sudo chmod +x /usr/local/bin/neofetch
         cd $HOME
+        echo "Neofetch installed to /usr/local/bin/"
     fi
 
     # Create neofetch config directory
