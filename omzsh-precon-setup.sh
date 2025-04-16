@@ -25,7 +25,7 @@ cleanup_all() {
     rm -rf $HOME/.oh-my-zsh
     rm -f $HOME/.zshrc $HOME/.zsh_history
     rm -f $HOME/.p10k.zsh  # Remove p10k config
-    
+
     # Remove zsh and related packages
     if command -v apt > /dev/null; then
         sudo apt remove --purge zsh neofetch -y
@@ -155,6 +155,21 @@ EOF
 
 # Setup neofetch
 setup_neofetch "$@"
+
+# Set zsh as default shell
+echo "Setting zsh as default shell..."
+sudo chsh -s $(which zsh) $USER
+
+# Add zsh launch to .bashrc for non-login shells
+echo "Adding zsh launch to .bashrc..."
+if ! grep -q "exec zsh" $HOME/.bashrc; then
+    echo "# Start zsh if it exists" >> $HOME/.bashrc
+    echo "if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ]; then" >> $HOME/.bashrc
+    echo "    if [[ \$- == *i* ]]; then" >> $HOME/.bashrc
+    echo "        exec zsh" >> $HOME/.bashrc
+    echo "    fi" >> $HOME/.bashrc
+    echo "fi" >> $HOME/.bashrc
+fi
 
 # Switch to Zsh
 echo "Switching to Zsh..."
