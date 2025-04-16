@@ -20,6 +20,24 @@ install_packages() {
     fi
 }
 
+# Function to install shell management tools to use chsh and set zsh as default shell
+install_shell_tools() {
+    echo "Installing shell management utilities..."
+    if command -v apt > /dev/null; then
+        # Debian/Ubuntu
+        sudo apt update && sudo apt install -y util-linux passwd
+    elif command -v dnf > /dev/null; then
+        # Fedora/RHEL 8+
+        sudo dnf install -y util-linux-user
+    elif command -v yum > /dev/null; then
+        # CentOS/RHEL 7
+        sudo yum install -y util-linux-user
+    elif command -v pacman > /dev/null; then
+        # Arch Linux
+        sudo pacman -Syu --noconfirm util-linux
+    fi
+}
+
 cleanup_all() {
     echo "Performing comprehensive cleanup..."
     rm -rf $HOME/.oh-my-zsh
@@ -44,6 +62,9 @@ cleanup_all
 # Install required packages
 echo "Installing required packages..."
 install_packages zsh git wget curl
+
+# Install shell management tools
+install_shell_tools
 
 # Install Oh My Zsh
 echo "Installing Oh My Zsh..."
