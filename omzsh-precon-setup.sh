@@ -249,7 +249,12 @@ else
 fi
 
 echo "=== Setup complete! ==="
-echo "Starting ZSH for current session..."
+echo "ZSH is now set as your default shell for future logins."
+echo "NOTE: You'll need to log out and log back in for the shell change to take effect."
+echo "ZSH setup completed successfully at $(date)"
 
-# 10. Switch to Zsh for current session
-exec "$ZSH_PATH" -l
+# Final setup marker
+touch $HOME/zsh-setup-complete.txt
+
+# NOT launching zsh for current session to allow cloud-init to continue
+# The next login will use zsh automatically
